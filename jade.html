@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"> </script>
+<title>Jade Delight</title>
+</head>
+
+<body>
+<script language="javascript">
+
+function MenuItem(name, cost)
+{
+	this.name = name;
+	this.cost=cost;
+}
+
+menuItems = new Array(
+	new MenuItem("Chicken Chop Suey", 4.5),
+	new MenuItem("Sweet and Sour Pork", 6.25),
+	new MenuItem("Shrimp Lo Mein", 6.25),
+	new MenuItem("Moo Shi Chicken", 7.5),
+	new MenuItem("Fried Rice", 2.85)
+);
+
+function makeSelect(name, minRange, maxRange)
+{
+	var t= "";
+	t = "<select name='" + name + "' size='1'>";
+	for (j=minRange; j<=maxRange; j++)
+	   t += "<option>" + j + "</option>";
+	t+= "</select>"; 
+	return t;
+}
+			
+// function td(content, className="")		
+// {		
+// 	return "<td class = '" + className + "'>" + content + "</td>";		
+// }
+</script>
+
+<h1>Jade Delight</h1>
+<form>
+
+<p class="userInfo"><label>First Name:</label> <input type="text"  id = "firstname" name='fname' /></p>
+<p class="userInfo"><label>Last Name*</label>:  <input type="text" id = "lastname" name='lname' /></p>
+<div id='delivery'>  
+    <p class="userInfo address"><label>Street*</label>: <input type="text" id = "street" name='street' /></p>
+    <p class="userInfo address"><label>City*</label>: <input type="text" id = "city" name='city' /></p>
+</div>
+<p class="userInfo"><label>Phone*</label>: <input type="text" id = "phone" name='phone' /></p>
+
+<p> 
+	<input type="radio"  name="p_or_d" value = "pickup" checked="checked"/>Pickup  
+	<input type="radio"  name='p_or_d' value = 'delivery'/>
+	Delivery
+</p>
+<table border="0" cellpadding="3">
+  <tr>
+    <th>Select Item</th>
+    <th>Item Name</th>
+    <th>Cost Each</th>
+    <th>Total Cost</th>
+  </tr>
+<script language="javascript">
+
+  var s = "";
+  for (i=0; i< menuItems.length; i++)
+  {
+	  s += "<tr><td>";
+	  s += makeSelect("quan" + i, 0, 10);
+	  s += "</td><td>" + menuItems[i].name + "</td>";
+	  s += "<td> $ " + menuItems[i].cost.toFixed(2) + "</td>";
+	  s += "<td> $<input type='text' name='cost'/> </td> </tr>";
+  }
+  document.writeln(s);
+  
+
+</script>
+</table>
+
+<p>Subtotal:
+	<div id = "subtotal">  </div> 
+</p>
+
+
+<p>Mass tax 6.25%:
+	<div id = "tax">  </div> 
+</p>
+
+<p>Total:
+	<div id = "total">  </div> 
+</p>
+
+<input type = "button" id = "submit" value = "Submit Order" />
+
+</form>
+
+<script language="javascript">
+
+var total = 0;
+var mooshi = 0;
+var numsuey = 0;
+var numlomein = 0;
+var numpork = 0;
+var rice = 0;  
+
+window.onload =function(){
+	$("input[name='cost']").val(0);
+	$("input[name='cost[0]']").val(22);
+	$("#subtotal").html(0);
+	$("#tax").html(0);
+	$("#total").html(0);
+}
+
+function totalcost() {
+		   
+	var subtotal = 0;
+	  				
+	$('[name="quan0"]').on('change', function() { 
+	  numsuey = $("select[name=quan0]").val();
+	  document.forms[0].cost[0].value= numsuey*4.5;
+
+	  var subtotal = calcsubtotal();
+	  totaltax(subtotal);	   
+	}); 
+	
+	$('[name="quan1"]').on('change', function() { 
+	  numpork = $("select[name=quan1]").val();
+	  document.forms[0].cost[1].value= numpork*6.25;
+
+	  var subtotal = calcsubtotal();
+	  totaltax(subtotal);	   	  	  
+	});  
+
+	$('[name="quan2"]').on('change', function() { 
+	   numlomein = $("select[name=quan2]").val();
+	   document.forms[0].cost[2].value= numlomein*6.25;
+  
+	   var subtotal = calcsubtotal();
+   	  totaltax(subtotal);	   
+	});  
+	
+	$('[name="quan3"]').on('change', function() { 
+	   mooshi = $("select[name=quan3]").val();
+	   document.forms[0].cost[3].value= (mooshi*7.5).toFixed(2);;
+
+	   var subtotal = calcsubtotal();
+ 	  totaltax(subtotal);	   
+  	});  
+
+	$('[name="quan4"]').on('change', function() { 
+	   rice = $("select[name=quan4]").val();
+	   document.forms[0].cost[4].value= (rice*2.85).toFixed(2);;
+  
+	   var subtotal = calcsubtotal();
+   	  totaltax(subtotal);	   
+	});  	
+}
+
+/*
+calculates the total and tax, and prints the subtotal, tax, and total 
+to the correct places on the page
+*/
+function totaltax(subtotal) {	
+	subtotal = subtotal.toFixed(2);
+	$("#subtotal").html(subtotal);
+	
+	var tax = subtotal*0.0625;
+	tax = tax.toFixed(2);
+	
+	total = subtotal*0.9375;
+	total = total.toFixed(2);
+	
+	$("#tax").html(tax);
+	$("#total").html(total);	
+}
+
+
+//calculates the subtotal by adding up all the food quantites and prices
+function calcsubtotal() {
+	var subtotal = (numpork*6.25) + (numsuey*4.5) + (numlomein*6.25) 
+	 + (mooshi*7.5) + (rice*2.85); 
+	 
+	return subtotal;
+}
+
+function showcitystreet() {	
+	$('[id="delivery"]').hide();
+			
+	$('[name="p_or_d"]').on('change', function() {		  
+		var output = document.querySelector('input[name="p_or_d"]:checked').value;
+
+		if(output == "delivery") {
+			$('[id="delivery"]').show();
+		}
+		
+		else {
+			$('[id="delivery"]').hide();
+		}
+	});  	 
+}
+
+
+totalcost();
+
+showcitystreet();
+
+
+document.getElementById("submit").onclick = function() {
+	
+	var validorder = true;
+	
+	lastname = $("input[id=lastname]").val();	
+	if(lastname == "" ) {
+		alert("ERROR: forgot to enter last name");
+		validorder = false;
+	}
+	phone = $("input[id=phone]").val();	
+	var checkphone = /^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g.test(phone);
+	if(checkphone == false) {
+		alert("ERROR: invalid phone format");
+		validorder = false;
+	}
+	
+	var pickup = 0;
+	var delivery = 0;
+		
+	var pickdeliv = document.querySelector('input[name="p_or_d"]:checked').value;
+	if(pickdeliv == "pickup" ) {
+		var mydate = new Date();	
+		var pickup = new Date(mydate.getTime() + 15*60000);
+		h = (pickup.getHours()<10?'0':'') + pickup.getHours(),
+		m = (pickup.getMinutes()<10?'0':'') + pickup.getMinutes();
+		pickup = h + ':' + m;
+
+	}
+	
+	if(pickdeliv == "delivery" ) {	
+		street = $("input[id=street]").val();
+		if(street == "" ) {
+			alert("ERROR: forgot to enter street");
+			validorder = false;
+		}
+		city = $("input[id=city]").val();
+		if(city == "" ) {
+			alert("ERROR: forgot to enter city");
+			validorder = false;
+		}
+		if(validorder == true ) {
+			var mydate = new Date();	
+			delivery = new Date(mydate.getTime() + 30*60000);
+			h = (delivery.getHours()<10?'0':'') + delivery.getHours(),
+			m = (delivery.getMinutes()<10?'0':'') + delivery.getMinutes();
+			delivery = h + ':' + m;
+		}
+	}
+
+	if(total == 0 ) {
+		alert("ERROR: noting has been ordered");
+		validorder = false;
+
+	}
+	if(validorder == true ) {
+		alertotal(pickdeliv, lastname, delivery, pickup);
+	}
+	
+}
+function alertotal(pickdeliv, lastname, delivery, pickup) {
+	output = "Thank you Mr/Mrs. " + lastname + " for ordering from Jade Delight!";
+	output += " We greatly appreciate your business, and hope you enjoy our"
+	+ " brand spanking new order form! \n \n"	
+	
+	output += "Order details: \n"
+	if(numsuey > 0 ) {
+		output += numsuey + " Chop Suey \n";
+	}		
+	if(numpork > 0 ) {
+		output += numpork + " Sweet and Sour Pork \n";
+	}	
+	if(numlomein > 0 ) {
+		output += numlomein + " Shrimp Lo mein \n";
+	}
+	if(mooshi > 0 ) {
+		output += mooshi + " Moo Shi Chicken \n";
+	}	
+	if(rice > 0 ) {
+		output += rice + " Fried Rice \n";
+	}	
+	
+	output += "\n";
+	
+	output += "Total: " + total + ". \n \n";
+
+	if(pickdeliv == "delivery") {
+		output += " Delivery time: " + delivery + ". ";
+	}	
+	if(pickdeliv == "pickup") {
+		output += " Pickup time: " + pickup ;
+	}
+	
+	
+	alert(output);
+	
+}
+
+
+</script>
+
+
+
+</body>
+</html>
